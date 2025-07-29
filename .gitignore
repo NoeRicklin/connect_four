@@ -2,3 +2,4 @@
 misc
 code/build.bat
 build/*
+!build
