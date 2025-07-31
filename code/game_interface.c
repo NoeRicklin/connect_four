@@ -177,6 +177,7 @@ int _test_pos_diag_win(int row, int col, int player) {
 }
 
 void print_game_state() {    
+	puts(" 1234567 ");
     puts("---------");
 
     for (int row = board_height - 1; row >= 0; row--) {
