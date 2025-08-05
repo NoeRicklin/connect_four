@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "game_interface.h"
+#include "headers/game_interface.h"
 
 #define ASCII_DIGIT_OFFSET 48
 #define COLUMN_BUFFER_LEN 10

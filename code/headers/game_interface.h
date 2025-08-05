@@ -1,3 +1,6 @@
+#ifndef GAME_INTERFACE
+#define GAME_INTERFACE
+
 #define FALSE		0
 #define TRUE		1
 
@@ -34,3 +37,5 @@ int test_win(int col, int player);
 int _test_hor_win(int row, int player);
 int _test_vert_win(int col, int player);
 int _test_diag_win(int row, int col, int player);
+
+#endif
