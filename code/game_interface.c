@@ -3,8 +3,7 @@
 #include "headers/game_interface.h"
 
 char game_state_p1[board_height * board_width]; //game state from perspective of player 1
-char game_state_p2[board_height * board_width];
-//game state from perspective of player -1 (player -1 selfishly thinks he is player 1)
+char game_state_p2[board_height * board_width]; //game state from perspective of player -1 (player -1 selfishly thinks he is player 1)
 
 unsigned char moves;
 

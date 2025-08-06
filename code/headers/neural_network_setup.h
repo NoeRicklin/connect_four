@@ -3,8 +3,18 @@
 
 //Neural network setup:
 #define INPUT_LAYER_LENGTH 42
-#define NUM_HIDDEN_LAYERS 1
-int hidden_layer_lengths[] = {INPUT_LAYER_LENGTH, 16};
 #define OUTPUT_LAYER_LENGTH 7
+#define NUM_HIDDEN_LAYERS 1
+
+#define NUMBER_OF_BOTS 100
+
+#define STRING_SIZE 128
+
+void neural_network_ram_setup();
+float **load_bots_parameters();
+size_t params_size();
+void initialize_bot_files();
+float random_float();
+float standard_normal_distribution();
 
 #endif
