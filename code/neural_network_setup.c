@@ -5,83 +5,84 @@
 
 #include "headers/neural_network_setup.h"
 
-#define PI 3.141592
+#define PI (float)3.141592
 
-int hidden_layer_lengths[] = {INPUT_LAYER_LENGTH, 16};
-float *layers[NUM_HIDDEN_LAYERS + 1];
-float output_layer[OUTPUT_LAYER_LENGTH];
+int hidden_layer_lengths_initialiser[] = {INPUT_LAYER_LENGTH, 16};
+int *hidden_layer_lengths;
+float **layers;
+float *output_layer;
 
 void neural_network_ram_setup() {
+    layers = (float **) malloc((NUM_HIDDEN_LAYERS + 1) * sizeof(float *));
+    output_layer = (float *) malloc(OUTPUT_LAYER_LENGTH * sizeof(float));
+    hidden_layer_lengths = (int *) malloc((NUM_HIDDEN_LAYERS + 1) * sizeof(int));
+
     for (int i = 0; i < NUM_HIDDEN_LAYERS + 1; i++) {
+        hidden_layer_lengths[i] = hidden_layer_lengths_initialiser[i];
         layers[i] = (float *) malloc(hidden_layer_lengths[i] * sizeof(float));
     }
 }
 
 int get_num_parameters() {
-	int num_parameters = 0;
-	
-	for (int layer = 0; layer < NUM_HIDDEN_LAYERS; layer++) {
-		num_parameters += (hidden_layer_lengths[layer] + 1) * hidden_layer_lengths[layer + 1];
-	}
-	num_parameters += (hidden_layer_lengths[NUM_HIDDEN_LAYERS] + 1) * OUTPUT_LAYER_LENGTH;
+    int num_parameters = 0;
 
-	return num_parameters;
+    for (int layer = 0; layer < NUM_HIDDEN_LAYERS; layer++) {
+        num_parameters += (hidden_layer_lengths[layer] + 1) * hidden_layer_lengths[layer + 1];
+    }
+    num_parameters += (hidden_layer_lengths[NUM_HIDDEN_LAYERS] + 1) * OUTPUT_LAYER_LENGTH;
+
+    return num_parameters;
 }
 
 float **load_bots_parameters() {
-	int num_parameters = get_num_parameters();
-	char path_string[STRING_SIZE];
+    int num_parameters = get_num_parameters();
+    char path_string[STRING_SIZE];
 
-	float **bots_parameters = (float **)malloc(NUMBER_OF_BOTS * sizeof(float *));
+    float **bots_parameters = (float **) malloc(NUMBER_OF_BOTS * sizeof(float *));
 
-	for (int bot_id = 0; bot_id < NUMBER_OF_BOTS; bot_id++) {
-		sprintf(path_string, "bots_params/bot%i", bot_id);
-		FILE *parameters_file = fopen(path_string, "r");
+    for (int bot_id = 0; bot_id < NUMBER_OF_BOTS; bot_id++) {
+        sprintf_s(path_string, sizeof(char) * STRING_SIZE, "bots_params/bot%i", bot_id);
+        FILE *parameters_file = fopen(path_string, "r");
 
-		bots_parameters[bot_id] = (float *)malloc(num_parameters * sizeof(float));
-		fread(bots_parameters[bot_id], sizeof(float), num_parameters, parameters_file);
+        bots_parameters[bot_id] = (float *) malloc(num_parameters * sizeof(float));
+        fread(bots_parameters[bot_id], sizeof(float), num_parameters, parameters_file);
+        fclose(parameters_file);
+    }
 
-		if (bot_id == 0) {
-			printf("bots_parameters[0]: %p\n", bots_parameters[0]);
-		}
-
-		fclose(parameters_file);
-	}
-
-	return bots_parameters;
+    return bots_parameters;
 }
 
 void initialize_bot_files() {
-	int num_parameters = get_num_parameters();
-	char path_string[STRING_SIZE];
+    int num_parameters = get_num_parameters();
+    char path_string[STRING_SIZE];
 
-	float *randomized_parameters = (float *)malloc(num_parameters * sizeof(float));
+    float *randomized_parameters = (float *) malloc(num_parameters * sizeof(float));
 
-	for (int bot_id = 0; bot_id < NUMBER_OF_BOTS; bot_id++) {
-		sprintf(path_string, "bots_params/bot%i", bot_id);
-		FILE *parameters_file = fopen(path_string, "w+");
+    for (int bot_id = 0; bot_id < NUMBER_OF_BOTS; bot_id++) {
+        sprintf_s(path_string, sizeof(float) * STRING_SIZE, "bots_params/bot%i", bot_id);
+        FILE *parameters_file = fopen(path_string, "w+");
 
-		for (int parameter_index = 0; parameter_index < num_parameters; parameter_index++) {
-			randomized_parameters[parameter_index] = random_float() - 0.5;
-		}
+        for (int parameter_index = 0; parameter_index < num_parameters; parameter_index++) {
+            randomized_parameters[parameter_index] = random_float() - (float) 0.5;
+        }
 
-		fwrite(randomized_parameters,
-				sizeof(float), num_parameters,
-				parameters_file);
+        fwrite(randomized_parameters,
+               sizeof(float), num_parameters,
+               parameters_file);
 
-		fclose(parameters_file);
-	}
+        fclose(parameters_file);
+    }
 }
 
 // returns number between 0 and 1 (not inclusive)
 float random_float() {
-	return (float)rand() / ((float)RAND_MAX + 1) + 0.000015259;
+    return (float) rand() / ((float) RAND_MAX + 1) + (float) 0.000015259;
 }
 
 // Box-Muller
 float standard_normal_distribution() {
-	float u1 = random_float();
-	float u2 = random_float();
+    float u1 = random_float();
+    float u2 = random_float();
 
-	return sqrtf(-2*logf(u1)) * cosf(2 * PI * u2);
+    return sqrtf(-2 * logf(u1)) * cosf(2 * PI * u2);
 }

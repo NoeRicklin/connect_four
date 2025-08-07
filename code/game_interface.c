@@ -2,12 +2,19 @@
 
 #include "headers/game_interface.h"
 
-char game_state_p1[board_height * board_width]; //game state from perspective of player 1
-char game_state_p2[board_height * board_width]; //game state from perspective of player -1 (player -1 selfishly thinks he is player 1)
+#include <stdlib.h>
+
+char *game_state_p1; //game state from perspective of player 1
+char *game_state_p2; //game state from perspective of player -1 (player -1 selfishly thinks he is player 1)
 
 unsigned char moves;
 
-int put_stone(int col, int player) {
+void initialise_game_states() {
+    game_state_p1 = (char *) calloc(board_height * board_width, sizeof(char));
+    game_state_p2 = (char *) calloc(board_height * board_width, sizeof(char));
+}
+
+int put_stone(int col, char player) {
     if (player != PLAYER_ONE && player != PLAYER_TWO) {
         return INVALID_PLAYER;
     }
@@ -31,7 +38,7 @@ int put_stone(int col, int player) {
     return PUT_SUCCESS;
 }
 
-int test_win(int col, int player) {
+int test_win(int col, char player) {
     int result = 0;
 
     int row = board_height - 1;
@@ -65,7 +72,7 @@ int test_win(int col, int player) {
     return result;
 }
 
-int _test_hor_win(int row, int player) {
+int _test_hor_win(int row, char player) {
     int counter = 0;
 
     for (int stone_index = 0; stone_index < board_width; stone_index++) {
@@ -83,7 +90,7 @@ int _test_hor_win(int row, int player) {
     return FALSE;
 }
 
-int _test_vert_win(int col, int player) {
+int _test_vert_win(int col, char player) {
     int counter = 0;
 
     for (int stone_index = 0; stone_index < board_width; stone_index++) {
@@ -97,10 +104,10 @@ int _test_vert_win(int col, int player) {
     return FALSE;
 }
 
-int _test_diag_win(int row, int col, int player) {
+int _test_diag_win(int row, int col, char player) {
     // Algorithm: Determine first stone on the relevant diagonal using a
     // lookup-table indexed by the module of the index of the new stone,
-    // which all stones on the same diagonal share. Also only do this
+    // which all stones on the same diagonal share. Also, only do this
     // for diagonals containing at least four tiles.
 
     if (_test_neg_diag_win(row, col, player) || _test_pos_diag_win(row, col, player)) {
@@ -110,11 +117,11 @@ int _test_diag_win(int row, int col, int player) {
     }
 }
 
-int _test_neg_diag_win(int row, int col, int player) {
+int _test_neg_diag_win(int row, int col, char player) {
     int new_stone_index = row * board_width + col;
 
-    int diag_start_index_lookup[6] =    {36, 37, 38, 21, 28, 35};
-    int diag_length_lookup[6] =         {6, 5, 4, 4, 5, 6};
+    int diag_start_index_lookup[6] = {36, 37, 38, 21, 28, 35};
+    int diag_length_lookup[6] = {6, 5, 4, 4, 5, 6};
     int diag_offset = -6;
 
     int counter = 0;
@@ -140,11 +147,11 @@ int _test_neg_diag_win(int row, int col, int player) {
     } else { return FALSE; }
 }
 
-int _test_pos_diag_win(int row, int col, int player) {
+int _test_pos_diag_win(int row, int col, char player) {
     int new_stone_index = row * board_width + col;
 
-    int diag_start_index_lookup[8] =    {40, 41, 34, 27, 0, 0, 38, 39};
-    int diag_length_lookup[8] =         {6, 6, 5, 4, 0, 0, 4, 5};
+    int diag_start_index_lookup[8] = {40, 41, 34, 27, 0, 0, 38, 39};
+    int diag_length_lookup[8] = {6, 6, 5, 4, 0, 0, 4, 5};
     int diag_offset = -8;
 
     int counter = 0;

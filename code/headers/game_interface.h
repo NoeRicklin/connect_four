@@ -30,12 +30,16 @@
 #define PLAYER_TWO	-1
 #define EMPTY_TILE	0
 
-int put_stone(int col, int player);
-void print_game_state();
-int test_win(int col, int player);
+void initialise_game_states();
 
-int _test_hor_win(int row, int player);
-int _test_vert_win(int col, int player);
-int _test_diag_win(int row, int col, int player);
+int put_stone(int col, char player);
+void print_game_state();
+int test_win(int col, char player);
+
+int _test_hor_win(int row, char player);
+int _test_vert_win(int col, char player);
+int _test_diag_win(int row, int col, char player);
+int _test_neg_diag_win(int row, int col, char player);
+int _test_pos_diag_win(int row, int col, char player);
 
 #endif
