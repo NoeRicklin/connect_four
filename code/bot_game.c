@@ -18,7 +18,6 @@ int result;
 
 int main() {
     initialise_game_states();
-    print_game_state();
 
     neural_network_ram_setup();
     initialize_bot_files();
@@ -50,10 +49,10 @@ int main() {
         column = bot_move(game_state, parameters, current_player);
 
         result = test_win(column, current_player);
-        print_game_state();
 
         if (result & WIN) {
             running = 0;
+			print_game_state();
             printf("Player %i won!\n", current_player);
             printf("Result: %x\n", result);
         }

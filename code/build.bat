@@ -8,7 +8,7 @@ md bots_params 2> nul
 pushd ..\build
 del /q *
 
-cl ..\code\*.c /Fe: game.exe /W4
+cl ..\code\*.c /Fe: game.exe /W4 /Zi
 
 popd
 popd
