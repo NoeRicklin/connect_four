@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include "headers/neural_network_setup.h"
+
 char *game_state_p1; //game state from perspective of player 1
 char *game_state_p2; //game state from perspective of player -1 (player -1 selfishly thinks he is player 1)
+float bot_fitness[NUMBER_OF_BOTS];
 
 unsigned char moves;
 
@@ -14,8 +17,8 @@ void initialise_game_states() {
 }
 
 void reset_game() {
-    memset(game_state_p1, (char)0, board_height * board_width * sizeof(char));
-    memset(game_state_p2, (char)0, board_height * board_width * sizeof(char));
+    memset(game_state_p1, (char) 0, board_height * board_width * sizeof(char));
+    memset(game_state_p2, (char) 0, board_height * board_width * sizeof(char));
     moves = 0;
 }
 

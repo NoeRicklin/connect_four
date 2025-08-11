@@ -10,11 +10,14 @@
 
 #define STRING_SIZE 128
 
+#define SIGMA 15
+
 void neural_network_ram_setup();
 float **load_bots_parameters();
+int get_num_parameters();
 size_t params_size();
 void initialize_bot_files();
 float random_float();
-float standard_normal_distribution();
+float normal_distribution();
 
 #endif

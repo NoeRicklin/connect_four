@@ -30,11 +30,10 @@ int bot_move(char *game_state, float *parameters, char player)
 				next_layer_current_node_accumulator += parameters[parameter_index++] * layers[layer_index][current_layer_node_index];
 			}
 
-			/*
 			if (next_layer_current_node_accumulator < 0) {
 				next_layer_current_node_accumulator = 0;
 			}
-			*/
+
 			layers[layer_index + 1][next_layer_node_index] = next_layer_current_node_accumulator;
 		}
     }
