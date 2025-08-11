@@ -18,6 +18,7 @@ void next_generation() {
     for (int child_index = NUM_SURVIVORS; child_index < NUMBER_OF_BOTS; child_index++) {
         make_child(bot_fitnesses[parent_index++ % NUM_SURVIVORS].bot_id, bot_fitnesses[child_index].bot_id);
     }
+	store_bots_parameters(bots_parameters);
 }
 
 void make_child(int parent_id, int child_id) {

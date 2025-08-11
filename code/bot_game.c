@@ -7,7 +7,7 @@
 #include "headers/generation_creation.h"
 
 #define ASCII_DIGIT_OFFSET 48
-#define NUM_GENERATIONS 10
+#define NUM_GENERATIONS 25000
 
 extern char *game_state_p1;
 extern char *game_state_p2;
@@ -17,15 +17,26 @@ int running = 1;
 int result;
 extern float bot_fitness[NUMBER_OF_BOTS];
 float **bots_parameters;
+char input_buffer[2];
 
 int main() {
+	while (input_buffer[0] != 'y' && input_buffer[0] != 'n') {
+		fprintf(stderr, "Reinitialize parameters? (y/n): ");
+		fgets(input_buffer, 2, stdin);
+	}
+
     initialise_game_states();
     neural_network_ram_setup();
-    initialize_bot_files();
+
+	if (input_buffer[0] == 'y') {
+		initialize_bot_files();
+	}
+
     bots_parameters = load_bots_parameters();
 
     for (int generation = 1; generation <= NUM_GENERATIONS; generation++) {
-        clock_t begin = clock();
+        clock_t generation_start = clock();
+		int generation_total_moves = 0;
 
         for (int bot1 = 0; bot1 < NUMBER_OF_BOTS; bot1++) {
             for (int bot2 = 0; bot2 < NUMBER_OF_BOTS; bot2++) {
@@ -53,6 +64,7 @@ int main() {
                     result = test_win(column, current_player);
 
                     if (result & WIN) {
+						generation_total_moves += result >> GAME_MOVE_OFFSET;
                         running = 0;
                         switch (current_player) {
                             case PLAYER_ONE:
@@ -70,6 +82,7 @@ int main() {
                         reset_game();
                     }
                     if (result & DRAW) {
+						generation_total_moves += result >> GAME_MOVE_OFFSET;
                         running = 0;
                         //print_game_state();
                         //printf("It's a draw!");
@@ -81,8 +94,17 @@ int main() {
                 }
             }
         }
-        clock_t end = clock();
-        printf("Generation %i took %f seconds \n", generation, (float) (end - begin) / CLOCKS_PER_SEC);
+        clock_t generation_end = clock();
         next_generation();
+        printf("Generation %5i took %f seconds with an average of %5.2f moves per game\n",
+				generation,
+				(float) (generation_end - generation_start) / CLOCKS_PER_SEC,
+				generation_total_moves / (float)(NUMBER_OF_BOTS * NUMBER_OF_BOTS));
+		fprintf(stderr,
+				"Generation %5i took %f seconds with an average of %5.2f moves per game\n",
+				generation,
+				(float) (generation_end - generation_start) / CLOCKS_PER_SEC,
+				generation_total_moves / (float)(NUMBER_OF_BOTS * NUMBER_OF_BOTS));
+
     }
 }

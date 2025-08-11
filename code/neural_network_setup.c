@@ -88,6 +88,8 @@ void initialize_bot_files() {
 
         fclose(parameters_file);
     }
+
+	free(randomized_parameters);
 }
 
 // returns number between 0 and 1 (not inclusive)
