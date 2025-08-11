@@ -31,6 +31,7 @@
 #define EMPTY_TILE	0
 
 void initialise_game_states();
+void reset_game();
 
 int put_stone(int col, char player);
 void print_game_state();

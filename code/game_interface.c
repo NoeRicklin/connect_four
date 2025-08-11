@@ -1,8 +1,7 @@
 #include <stdio.h>
-
 #include "headers/game_interface.h"
-
 #include <stdlib.h>
+#include <memory.h>
 
 char *game_state_p1; //game state from perspective of player 1
 char *game_state_p2; //game state from perspective of player -1 (player -1 selfishly thinks he is player 1)
@@ -12,6 +11,12 @@ unsigned char moves;
 void initialise_game_states() {
     game_state_p1 = (char *) calloc(board_height * board_width, sizeof(char));
     game_state_p2 = (char *) calloc(board_height * board_width, sizeof(char));
+}
+
+void reset_game() {
+    memset(game_state_p1, (char)0, board_height * board_width * sizeof(char));
+    memset(game_state_p2, (char)0, board_height * board_width * sizeof(char));
+    moves = 0;
 }
 
 int put_stone(int col, char player) {
