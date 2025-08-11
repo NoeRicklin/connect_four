@@ -2,6 +2,7 @@
 #include "headers/game_interface.h"
 #include "headers/neural_network_setup.h"
 #include <stdlib.h>
+#include <memory.h>
 
 extern float bot_fitness[NUMBER_OF_BOTS];
 extern float **bots_parameters;
@@ -27,6 +28,8 @@ struct fitness_stats next_generation() {
 
 	fs.max_fitness = bot_fitnesses[0].fitness;
 	fs.min_fitness = bot_fitnesses[NUMBER_OF_BOTS - 1].fitness;
+
+	memset(bot_fitness, 0, NUMBER_OF_BOTS * sizeof(float));
 	return fs;
 }
 
