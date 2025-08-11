@@ -8,17 +8,26 @@ extern float **bots_parameters;
 
 struct bot_fitness_struct bot_fitnesses[NUMBER_OF_BOTS];
 
-void next_generation() {
+struct fitness_stats next_generation() {
+	struct fitness_stats fs = {0};
+
     for (int i = 0; i < NUMBER_OF_BOTS; i++) {
         bot_fitnesses[i].bot_id = i;
         bot_fitnesses[i].fitness = bot_fitness[i];
+		fs.avg_fitness += bot_fitness[i];
     }
+	fs.avg_fitness /= NUMBER_OF_BOTS;
+
     qsort(bot_fitnesses, NUMBER_OF_BOTS, sizeof(struct bot_fitness_struct), compare_bots);
     int parent_index = 0;
     for (int child_index = NUM_SURVIVORS; child_index < NUMBER_OF_BOTS; child_index++) {
         make_child(bot_fitnesses[parent_index++ % NUM_SURVIVORS].bot_id, bot_fitnesses[child_index].bot_id);
     }
 	store_bots_parameters(bots_parameters);
+
+	fs.max_fitness = bot_fitnesses[0].fitness;
+	fs.min_fitness = bot_fitnesses[NUMBER_OF_BOTS - 1].fitness;
+	return fs;
 }
 
 void make_child(int parent_id, int child_id) {

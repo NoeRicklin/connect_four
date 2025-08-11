@@ -10,7 +10,7 @@
 
 #define STRING_SIZE 128
 
-#define SIGMA 15
+#define SIGMA (float)0.2
 
 void neural_network_ram_setup();
 float **load_bots_parameters();

@@ -57,12 +57,12 @@ int test_win(int col, char player) {
         result |= HORIZONTAL_WIN;
     }
 
-    if (_test_vert_win(col, player)) {
+	else if (_test_vert_win(col, player)) {
         result |= WIN;
         result |= VERTICAL_WIN;
     }
 
-    if (_test_diag_win(row, col, player)) {
+	else if (_test_diag_win(row, col, player)) {
         result |= WIN;
         result |= DIAGONAL_WIN;
     }

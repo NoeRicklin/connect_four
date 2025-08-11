@@ -8,7 +8,13 @@ struct bot_fitness_struct {
     float fitness;
 };
 
-void next_generation();
+struct fitness_stats {
+	float avg_fitness;
+	float max_fitness;
+	float min_fitness;
+};
+
+struct fitness_stats next_generation();
 void make_child(int parent_id, int child_id);
 int compare_bots(const void *a, const void *b);
 
