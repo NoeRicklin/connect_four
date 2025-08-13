@@ -8,6 +8,7 @@ extern float bot_fitness[NUMBER_OF_BOTS];
 extern float **bots_parameters;
 
 struct bot_fitness_struct bot_fitnesses[NUMBER_OF_BOTS];
+int prev_bot_fitnesses[NUM_SURVIVORS];
 
 struct fitness_stats next_generation() {
 	struct fitness_stats fs = {0};
@@ -28,6 +29,19 @@ struct fitness_stats next_generation() {
 
 	fs.max_fitness = bot_fitnesses[0].fitness;
 	fs.min_fitness = bot_fitnesses[NUMBER_OF_BOTS - 1].fitness;
+
+	fs.survivor_changes = NUM_SURVIVORS;
+	for (int i = 0; i < NUM_SURVIVORS; i++) {
+		for (int j = 0; j < NUM_SURVIVORS; j++) {
+			if (bot_fitnesses[i].bot_id == prev_bot_fitnesses[j]) {
+				fs.survivor_changes--;
+			}
+		}
+	}
+
+	for (int i = 0; i < NUM_SURVIVORS; i++) {
+		prev_bot_fitnesses[i] = bot_fitnesses[i].bot_id;
+	}
 
 	memset(bot_fitness, 0, NUMBER_OF_BOTS * sizeof(float));
 	return fs;

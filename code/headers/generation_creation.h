@@ -12,6 +12,7 @@ struct fitness_stats {
 	float avg_fitness;
 	float max_fitness;
 	float min_fitness;
+	int survivor_changes;
 };
 
 struct fitness_stats next_generation();

@@ -79,7 +79,7 @@ void initialize_bot_files() {
         fopen_s(&parameters_file, path_string, "wb");
 
         for (int parameter_index = 0; parameter_index < num_parameters; parameter_index++) {
-            randomized_parameters[parameter_index] = (random_float() - (float)0.5);
+            randomized_parameters[parameter_index] = 100*(random_float() - (float)0.5);
         }
 
         fwrite(randomized_parameters,

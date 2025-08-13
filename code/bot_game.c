@@ -11,12 +11,13 @@
 #include <string.h>
 
 #define ASCII_DIGIT_OFFSET 48
-#define NUM_GENERATIONS 10000
+#define NUM_GENERATIONS 25000
 
 extern char *game_state_p1;
 extern char *game_state_p2;
 
 char current_player = 1;
+int starting_generation = 1;
 int running = 1;
 int result;
 extern float bot_fitness[NUMBER_OF_BOTS];
@@ -32,21 +33,44 @@ int main() {
     initialise_game_states();
     neural_network_ram_setup();
 
+	char *log_path = "..\\misc\\logs.csv";
+	FILE *log_file;
+
 	if (input_buffer[0] == 'y') {
 		initialize_bot_files();
-	}
 
-	char *log_path = "..\\misc\\logs.csv";
-	FILE *log_file = fopen(log_path, "w");
-	fclose(log_file);
-	log_file = fopen(log_path, "w");
-	char *log_header = "Generation-ID,Calculation time,Average number of moves,Average Fitness,Highest Fitness,Lowest Fitness,Vertical Wins,Horizontal Wins,Diagonal Wins,Draws\n";
-	fwrite(log_header, sizeof(char), strlen(log_header), log_file);
-	fclose(log_file);
+		log_file = fopen(log_path, "w");
+		fclose(log_file);
+		log_file = fopen(log_path, "w");
+		char *log_header = "Generation-ID,Calculation time,Average number of moves,Number of new Survivors,Average Fitness,Highest Fitness,Lowest Fitness,Vertical Wins,Horizontal Wins,Diagonal Wins,Draws\n";
+		fwrite(log_header, sizeof(char), strlen(log_header), log_file);
+		fclose(log_file);
+	}
+	else if (input_buffer[0] == 'n') {
+		int num_lines = 0;
+		int buffer_size = 1024;
+		char *buffer = malloc(buffer_size * sizeof(1024));
+
+		log_file = fopen(log_path, "r");
+		size_t num_read;
+		
+		do {
+			num_read = fread(buffer, sizeof(char), buffer_size, log_file);
+
+			for (int i = 0; i < num_read; i++) {
+				if (buffer[i] == '\n') { num_lines++; }
+			}
+		} while (num_read);
+
+		free(buffer);
+		fclose(log_file);
+
+		starting_generation = num_lines;
+	}
 
     bots_parameters = load_bots_parameters();
 
-    for (int generation = 1; generation <= NUM_GENERATIONS; generation++) {
+    for (int generation = starting_generation; generation < starting_generation + NUM_GENERATIONS; generation++) {
         clock_t generation_start = clock();
 
 		int generation_total_moves = 0;
@@ -57,6 +81,8 @@ int main() {
 
         for (int bot1 = 0; bot1 < NUMBER_OF_BOTS; bot1++) {
             for (int bot2 = 0; bot2 < NUMBER_OF_BOTS; bot2++) {
+				if (bot1 == bot2) { continue; }
+
                 float *parameters_p1 = bots_parameters[bot1];
                 float *parameters_p2 = bots_parameters[bot2];
                 char *game_state;
@@ -92,10 +118,18 @@ int main() {
                             case PLAYER_ONE:
                                 bot_fitness[bot1] += (float)50.0 + (float)moves;
                                 bot_fitness[bot2] -= fmaxf((float)20.0 - (float)moves, (float)0);
+								if (result & VERTICAL_WIN) {
+									bot_fitness[bot1] -= (float)20.0;
+									bot_fitness[bot2] -= (float)10.0;
+								}
                                 break;
                             case PLAYER_TWO:
                                 bot_fitness[bot2] += (float)55.0 + (float)moves;
                                 bot_fitness[bot1] -= fmaxf((float)22.0 - (float)moves, (float)0);
+								if (result & VERTICAL_WIN) {
+									bot_fitness[bot2] -= (float)20.0;
+									bot_fitness[bot1] -= (float)10.0;
+								}
                                 break;
                             default:
                                 break;
@@ -107,6 +141,10 @@ int main() {
 						int moves = result >> GAME_MOVE_OFFSET;
 						generation_total_moves += moves;
                         running = 0;
+
+						bot_fitness[bot1] -= (float)70.0;
+						bot_fitness[bot2] -= (float)70.0;
+
                         reset_game();
                     }
 
@@ -117,17 +155,19 @@ int main() {
 		clock_t generation_end = clock();
 		struct fitness_stats fs = next_generation();
 
-		printf("Generation %5i took %4.2f seconds with an average of %5.2f moves per game\n",
+		printf("Gen: %5i, time: %4.2f, moves: %6.3f, new Survivors: %2i\n",
 				generation,
 				(float)(generation_end - generation_start) / CLOCKS_PER_SEC,
-				generation_total_moves / (float)(NUMBER_OF_BOTS * NUMBER_OF_BOTS));
+				generation_total_moves / (float)((NUMBER_OF_BOTS - 1) * NUMBER_OF_BOTS),
+				fs.survivor_changes);
 
 		log_file = fopen(log_path, "a");
 		char generation_data[100];
-		sprintf(generation_data, "%i,%f,%f,%f,%f,%f,%i,%i,%i,%i\n",
+		sprintf(generation_data, "%i,%f,%f,%i,%f,%f,%f,%i,%i,%i,%i\n",
 				generation,
 				(float)(generation_end - generation_start) / CLOCKS_PER_SEC,
-				generation_total_moves / (float)(NUMBER_OF_BOTS * NUMBER_OF_BOTS),
+				generation_total_moves / (float)((NUMBER_OF_BOTS - 1) * NUMBER_OF_BOTS),
+				fs.survivor_changes,
 				fs.avg_fitness,
 				fs.max_fitness,
 				fs.min_fitness,
